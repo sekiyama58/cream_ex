@@ -60,7 +60,7 @@ defmodule Cream.Mixfile do
   defp deps do
     [
       {:memcachex, ">= 0.4.0"},
-      {:uuid, "~> 1.1"},
+      {:elixir_uuid, "~> 1.2.1"},
       {:poison, ">= 2.0.0"},
       {:poolboy, "~> 1.5"},
       {:ex_doc, "~> 0.0", only: :dev},
