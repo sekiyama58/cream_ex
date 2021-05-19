@@ -20,9 +20,9 @@ defmodule Cream.Continuum do
       |> List.to_tuple
   end
 
-  def find(continuum, key, attempt \\ 0)
-  def find(_, _, 20), do: {:error, "No server available"}
-  def find(continuum, key, attempt) do
+  def find(continuum, key, state, attempt \\ 0)
+  def find(_, _, _, 20), do: {:error, "No server available"}
+  def find(continuum, key, state, attempt) do
 
     # Calculate the key's hash. If we're on attempt zero, then we don't modify it.
     hkey = if attempt == 0 do
@@ -39,10 +39,10 @@ defmodule Cream.Continuum do
     # Get the server.
     {server_id, _} = elem(continuum, i)
 
-    if alive?(server_id) do
+    if alive?(state, server_id) do
       {:ok, server_id}
     else
-      find(continuum, key, attempt + 1)
+      find(continuum, key, state, attempt + 1)
     end
 
   end
@@ -63,6 +63,7 @@ defmodule Cream.Continuum do
     end
   end
 
-  defp alive?(_), do: true
-
+  defp alive?(state, server_id) do
+    GenServer.call(state, {:alive?, server_id})
+  end
 end
