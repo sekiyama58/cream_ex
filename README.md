@@ -15,6 +15,7 @@ It uses the same consistent hashing algorithm to connect to a cluster of memcach
 1. [Memcachex API](#memcachex-api)
 1. [Ruby compatibility](#ruby-compatibility)
 1. [Supervision](#supervision)
+1. [Failover](#failover)
 1. [Instrumentation](#instrumentation)
 1. [Documentation](https://hexdocs.pm/cream/Cream.Cluster.html)
 1. [Running the tests](#running-the-tests)
@@ -213,6 +214,16 @@ No pids are stored anywhere, but instead processes are tracked via Elixir's
 
 The results of `Cream.Cluster.start_link` and `MyClusterModule.start_link` can
 be inserted into your application's supervision tree.
+
+## Failover
+
+When memcache operations on a memcache server are failed specified times,
+the server is marked "down". To avoid hang during reconnection to the server,
+operations to failed servers are redirected to alternative servers by the
+consistency hashing algorithm.
+The server health status is checked periodically, and once the server connection
+is recovered, the operations are sent again to the server.
+This behavior can be disabled by the `failover: false` parameter in the config.
 
 ## Instrumentation
 
