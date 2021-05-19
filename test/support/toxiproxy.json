@@ -1,0 +1,20 @@
+[
+  {
+    "name": "memcached_01",
+    "listen": "[::]:11201",
+    "upstream": "memcached_01:11211",
+    "enabled": true
+  },
+  {
+    "name": "memcached_02",
+    "listen": "[::]:11202",
+    "upstream": "memcached_02:11211",
+    "enabled": true
+  },
+  {
+    "name": "memcached_03",
+    "listen": "[::]:11203",
+    "upstream": "memcached_03:11211",
+    "enabled": true
+  }
+]
