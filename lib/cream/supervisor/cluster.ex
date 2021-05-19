@@ -11,6 +11,7 @@ defmodule Cream.Supervisor.Cluster do
 
   def init(options) do
     servers = options[:servers]
+    state = options[:state]
 
     # Make a map of server to Memcache.Connection name so that
     # Cluster.Worker process knows how to access the connections managed by
@@ -42,7 +43,7 @@ defmodule Cream.Supervisor.Cluster do
 
     # Cluster.Worker gets supervised and passed the connection name map.
     specs = [
-      worker(Cream.Cluster.Worker, [server_name_map]) | specs
+      worker(Cream.Cluster.Worker, [server_name_map, state]) | specs
     ]
 
     supervise(specs, strategy: :one_for_one)
