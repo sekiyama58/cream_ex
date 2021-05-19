@@ -63,7 +63,9 @@ defmodule Cream.Mixfile do
       {:uuid, "~> 1.1"},
       {:poison, ">= 2.0.0"},
       {:poolboy, "~> 1.5"},
-      {:ex_doc, "~> 0.0", only: :dev},
+      {:ex_doc, "~> 0.21", only: :docs},
+      {:dialyxir, "~> 1.0.0-rc.3", only: :dev, runtime: false},
+      {:toxiproxy, "~> 0.3", only: :test},
       {:instrumentation, ">= 0.1.0"}
     ]
   end

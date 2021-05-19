@@ -4,15 +4,20 @@ services:
 
   memcached_01:
     image: memcached:alpine
-    ports:
-      - 11201:11211
 
   memcached_02:
     image: memcached:alpine
-    ports:
-      - 11202:11211
 
   memcached_03:
     image: memcached:alpine
+
+  toxiproxy:
+    image: shopify/toxiproxy:latest
     ports:
-      - 11203:11211
+      - "8474:8474"
+      - "11201:11201"
+      - "11202:11202"
+      - "11203:11203"
+    volumes:
+      - "./test/support/toxiproxy.json:/toxiproxy.json"
+    command: ["-config", "/toxiproxy.json", "-host", "0.0.0.0"]

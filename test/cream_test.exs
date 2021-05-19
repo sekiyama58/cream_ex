@@ -8,6 +8,7 @@ defmodule CreamTest do
   alias Test.Cluster
 
   setup do
+    {:ok, _} = Toxiproxy.reset()
     Cluster.flush
     :ok
   end
@@ -129,5 +130,4 @@ defmodule CreamTest do
     assert Cluster.get("foo") == nil
     assert Cluster.get("one") == nil
   end
-
 end
