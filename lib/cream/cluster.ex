@@ -83,6 +83,9 @@ defmodule Cream.Cluster do
   """
   @type config :: Keyword.t
 
+  @poolboy_timeout 5000
+  @command_timeout @poolboy_timeout + 1000
+
   defmacro __using__(opts) do
     quote location: :keep, bind_quoted: [opts: opts] do
 
@@ -291,14 +294,14 @@ defmodule Cream.Cluster do
   set(cluster, %{k1 => v1, k2 => v2}, ttl: 300)
   ```
   """
- @spec set(t, item, Keyword.t()) :: :ok | {:error, reason}
- @spec set(t, items, Keyword.t()) :: %{required(key) => :ok | {:error, reason}}
- def set(cluster, item_or_items, opts \\ [])
+  @spec set(t, item, Keyword.t()) :: :ok | {:error, reason}
+  @spec set(t, items, Keyword.t()) :: %{required(key) => :ok | {:error, reason}}
+  def set(cluster, item_or_items, opts \\ [])
 
   def set(cluster, items, opts) when is_list(items) or is_map(items) do
     with_worker cluster, fn worker ->
       instrument "set", [items: items], fn ->
-        GenServer.call(worker, {:set, items, opts})
+        GenServer.call(worker, {:set, items, opts}, @command_timeout)
       end
     end
   end
@@ -330,7 +333,7 @@ defmodule Cream.Cluster do
   def get(cluster, keys, opts) do
     with_worker cluster, fn worker ->
       instrument "get", [keys: keys], fn ->
-        GenServer.call(worker, {:get, keys, opts})
+        GenServer.call(worker, {:get, keys, opts}, @command_timeout)
       end
     end
   end
@@ -403,7 +406,7 @@ defmodule Cream.Cluster do
   def delete(cluster, keys) when is_list(keys) do
     with_worker cluster, fn worker ->
       instrument "delete", [keys: keys], fn ->
-        GenServer.call(worker, {:delete, keys})
+        GenServer.call(worker, {:delete, keys}, @command_timeout)
       end
     end
   end
@@ -438,7 +441,7 @@ defmodule Cream.Cluster do
 
   def with_conn(cluster, keys, func) when is_list(keys) do
     with_worker cluster, fn worker ->
-      GenServer.call(worker, {:with_conn, keys, func})
+      GenServer.call(worker, {:with_conn, keys, func}, @command_timeout)
     end
   end
 
@@ -449,7 +452,7 @@ defmodule Cream.Cluster do
   def flush(cluster, opts \\ []) do
     with_worker cluster, fn worker ->
       instrument "flush", fn ->
-        GenServer.call(worker, {:flush, opts})
+        GenServer.call(worker, {:flush, opts}, @command_timeout)
       end
     end
   end
@@ -470,7 +473,6 @@ defmodule Cream.Cluster do
         |> Enum.find(& elem(&1, 0) == Cream.Cluster.Worker )
         |> elem(1)
         |> func.()
-    end
+    end, @poolboy_timeout
   end
-
 end
